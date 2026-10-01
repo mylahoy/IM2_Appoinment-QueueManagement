@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Document Request & Appointment System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#6366f1;
+    --primary-dark:#4f46e5;
+    --accent:#ec4899;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+    --bg:#eef1fb;
+    --card:#ffffff;
+    --text:#1e1b32;
+    --muted:#5c6178;
+    --border:#e5e7eb;
+    --radius:14px;
+    --radius-sm:10px;
+    --shadow-sm:0 1px 2px rgba(30,27,50,.06), 0 1px 3px rgba(30,27,50,.05);
+    --shadow-md:0 4px 12px rgba(79,70,229,.10), 0 2px 4px rgba(30,27,50,.06);
+    --shadow-lg:0 12px 28px rgba(79,70,229,.16), 0 4px 10px rgba(30,27,50,.08);
+    --ease:cubic-bezier(.4,0,.2,1);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:'Inter',-apple-system,'Segoe UI',Arial,sans-serif;color:var(--text);
+    background:
+      radial-gradient(1100px 500px at 100% -10%, rgba(236,72,153,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 0%, rgba(99,102,241,.14), transparent 55%),
+      var(--bg);
+    min-height:100vh;
+    animation:pageFadeIn .4s var(--ease);
+  }
+  @keyframes pageFadeIn{from{opacity:0;}to{opacity:1;}}
+  h1,h2,h3{font-family:'Poppins','Inter',sans-serif;letter-spacing:.1px;}
+  h2{font-size:19px;font-weight:700;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .skip-link{
+    position:absolute;left:-999px;top:0;background:var(--primary);color:#fff;padding:10px 16px;
+    border-radius:0 0 8px 0;z-index:1000;font-size:14px;
+  }
+  .skip-link:focus{left:0;}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+    outline:2px solid var(--primary-dark);outline-offset:2px;
+  }
+  header{
+    background:linear-gradient(120deg,var(--primary),#7c3aed 55%,var(--accent));
+    color:#fff;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;
+    box-shadow:0 4px 18px rgba(79,70,229,.28);
+    position:sticky;top:0;z-index:20;
+  }
+  header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px;}
+  header .user-info{display:flex;align-items:center;gap:12px;font-size:14px;}
+  header button{
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;
+    padding:7px 16px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;
+    backdrop-filter:blur(4px);transition:background .15s ease, transform .15s ease;
+  }
+  header button:hover{background:rgba(255,255,255,.32);transform:translateY(-1px);}
+  nav{
+    display:flex;gap:6px;background:rgba(255,255,255,.75);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);padding:8px 20px;overflow-x:auto;
+    position:sticky;top:62px;z-index:19;
+  }
+  nav button{
+    background:none;border:none;padding:10px 18px;cursor:pointer;font-size:14px;color:var(--muted);
+    white-space:nowrap;border-radius:999px;font-weight:600;transition:background .15s ease,color .15s ease;
+  }
+  nav button:hover{background:rgba(99,102,241,.08);color:var(--primary-dark);}
+  nav button.active{color:#fff;background:linear-gradient(120deg,var(--primary),var(--primary-dark));box-shadow:var(--shadow-sm);}
+  main{max-width:1100px;margin:28px auto;padding:0 20px 60px;}
+  .view{display:none;}
+  .view.active{display:block;animation:fadeIn .3s var(--ease);}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .card{
+    background:var(--card);border:1px solid rgba(229,231,235,.7);border-radius:var(--radius);
+    padding:24px;margin-bottom:20px;box-shadow:var(--shadow-sm);transition:box-shadow .2s ease, transform .2s ease;
+  }
+  .card:hover{box-shadow:var(--shadow-md);}
+  .card h2{margin:0 0 6px;font-size:18px;font-weight:700;}
+  .card > p{margin-bottom:16px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+  label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--muted);letter-spacing:.02em;text-transform:uppercase;}
+  input,select,textarea{
+    width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;
+    margin-bottom:12px;background:#fbfbfe;color:var(--text);font-family:inherit;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.15);background:#fff;
+  }
+  .btn{
+    background:linear-gradient(120deg,var(--primary),var(--primary-dark));color:#fff;border:none;
+    padding:11px 20px;min-height:42px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;
+    box-shadow:0 2px 8px rgba(79,70,229,.3);transition:transform .12s var(--ease), box-shadow .12s var(--ease), opacity .12s ease, filter .12s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(79,70,229,.35);filter:brightness(1.03);}
+  .btn:active{transform:translateY(0);filter:brightness(.98);}
+  .btn.secondary{background:#fff;color:var(--primary);border:1.5px solid var(--primary);box-shadow:none;}
+  .btn.secondary:hover{background:rgba(99,102,241,.08);box-shadow:none;}
+  .btn.danger{background:linear-gradient(120deg,var(--danger),#dc2626);box-shadow:0 2px 8px rgba(239,68,68,.3);}
+  .btn.success{background:linear-gradient(120deg,var(--success),#059669);box-shadow:0 2px 8px rgba(16,185,129,.3);}
+  .btn.warning{background:linear-gradient(120deg,var(--warning),#d97706);box-shadow:0 2px 8px rgba(245,158,11,.3);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;filter:none;}
+  .btn.sm{min-height:30px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:11px 12px;border-bottom:1px solid var(--border);text-align:left;}
+  th{
+    background:#f5f6fd;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+    position:sticky;top:114px;z-index:2;box-shadow:inset 0 -1px 0 var(--border);
+  }
+  tr:last-child td{border-bottom:none;}
+  tbody tr{transition:background .12s ease;}
+  tbody tr:nth-child(even) td{background:rgba(99,102,241,.035);}
+  tbody tr:hover td{background:#eef0fe;}
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em;
+  }
+  .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;}
+  .badge.waiting{background:#fef3c7;color:#92400e;}
+  .badge.serving{background:#dbeafe;color:#1e40af;}
+  .badge.done{background:#d1fae5;color:#065f46;}
+  .badge.cancelled{background:#fee2e2;color:#991b1b;}
+  .badge.confirmed{background:#ede9fe;color:#5b21b6;}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;}
+  .stat{
+    background:var(--card);border:1px solid rgba(229,231,235,.7);border-radius:var(--radius);
+    padding:18px;text-align:center;box-shadow:var(--shadow-sm);transition:transform .15s var(--ease), box-shadow .15s ease;
+    position:relative;overflow:hidden;border-top:3px solid var(--primary);
+  }
+  .stat::before{
+    font-size:18px;position:absolute;top:12px;right:14px;opacity:.5;
+  }
+  .stat:nth-child(1){border-top-color:var(--primary);}
+  .stat:nth-child(1)::before{content:'📄';}
+  .stat:nth-child(2){border-top-color:var(--accent);}
+  .stat:nth-child(2)::before{content:'📅';}
+  .stat:nth-child(3){border-top-color:var(--warning);}
+  .stat:nth-child(3)::before{content:'⏳';}
+  .stat:nth-child(4){border-top-color:var(--success);}
+  .stat:nth-child(4)::before{content:'🔢';}
+  .stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+  .stat .num{font-size:30px;font-weight:800;background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .stat .lbl{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;}
+  .queue-number{
+    font-size:58px;font-weight:800;text-align:center;margin:10px 0;
+    background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:queuePulse 2.4s ease-in-out infinite;
+  }
+  @keyframes queuePulse{0%,100%{opacity:1;}50%{opacity:.85;}}
+  .flex-between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .msg{padding:11px 15px;border-radius:10px;margin-bottom:14px;font-size:14px;font-weight:500;}
+  .msg.error{background:#fee2e2;color:#991b1b;}
+  .msg.ok{background:#d1fae5;color:#065f46;}
+  .auth-wrap{max-width:860px;margin:60px auto;padding:0 16px;position:relative;isolation:isolate;animation:fadeIn .4s var(--ease);}
+  .auth-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;}
+  .auth-grid > .card{margin-bottom:0;}
+  .auth-wrap::before,.auth-wrap::after{
+    content:'';position:fixed;z-index:-1;border-radius:50%;filter:blur(50px);pointer-events:none;
+  }
+  .auth-wrap::before{top:-120px;right:-100px;width:320px;height:320px;background:radial-gradient(circle,rgba(236,72,153,.30),transparent 70%);}
+  .auth-wrap::after{bottom:-140px;left:-120px;width:320px;height:320px;background:radial-gradient(circle,rgba(99,102,241,.30),transparent 70%);}
+  .auth-wrap .card{box-shadow:var(--shadow-lg);border-top:4px solid transparent;border-image:linear-gradient(120deg,var(--primary),var(--accent)) 1;}
+  .auth-wrap .card h2{background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:20px;}
+  .tabs-mini{display:flex;gap:8px;margin-bottom:18px;background:#f1f2fb;padding:5px;border-radius:12px;}
+  .tabs-mini button{flex:1;padding:9px;border:none;background:none;border-radius:9px;cursor:pointer;font-weight:600;color:var(--muted);transition:background .15s ease,color .15s ease;}
+  .tabs-mini button.active{background:#fff;color:var(--primary-dark);box-shadow:var(--shadow-sm);}
+  .empty{color:var(--muted);text-align:center;padding:36px 20px;font-size:14px;}
+  .empty-icon{font-size:34px;line-height:1;margin-bottom:8px;}
+  .actions-cell{display:flex;gap:6px;flex-wrap:wrap;}
+  .actions-cell button{padding:6px 12px;font-size:12px;min-height:30px;}
+  .btn.sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+  .field-error{color:var(--danger);font-size:12px;margin:-8px 0 12px;}
+  input.invalid,select.invalid,textarea.invalid{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.14);}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);}
+  .table-scroll table{min-width:560px;}
+  .scroll-hint{display:none;font-size:12px;color:var(--muted);align-items:center;gap:6px;margin:0 0 10px;}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;}
+  @media (max-width:760px){
+    .scroll-hint{display:flex;}
+    .auth-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:520px){
+    header{padding:12px 16px;flex-wrap:wrap;gap:8px;}
+    header h1{font-size:17px;}
+    nav{top:56px;}
+    main{margin:12px auto;padding:0 10px 40px;}
+    .card{padding:16px;}
+    .queue-number{font-size:42px;}
+    .auth-wrap{margin:32px auto;}
+    .auth-wrap::before,.auth-wrap::after{width:220px;height:220px;filter:blur(36px);}
+    th,td{padding:9px 10px;}
+    th{position:static;}
+  }
+
+  /* ---- Center-aligned layout (applies to header, nav, cards, forms, tables, stats) ---- */
+  body{text-align:center;}
+  header{justify-content:center;text-align:center;}
+  header .user-info{justify-content:center;}
+  nav{justify-content:center;}
+  main{text-align:center;}
+  .card, .card h2, .card p{text-align:center;}
+  .grid{justify-items:center;}
+  .grid > div{width:100%;max-width:340px;}
+  label{text-align:center;}
+  input, select, textarea{text-align:center;max-width:420px;margin-left:auto;margin-right:auto;}
+  form{display:flex;flex-direction:column;align-items:center;}
+  form > .grid{width:100%;}
+  .flex-between, .actions-cell{justify-content:center;}
+  table{margin:0 auto;}
+  th, td{text-align:center;}
+  .stats{justify-content:center;}
+  .tabs-mini{justify-content:center;}
+  .auth-wrap{text-align:center;}
+</style>
+</head>
+<body>
+
+<a href="#mainContent" class="skip-link">Skip to main content</a>
+
+<div id="authScreen" class="auth-wrap">
+  <h1 style="text-align:center;margin:0 0 20px;background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent">🎓 School Document Request System</h1>
+  <div id="authMsg" role="alert" aria-live="polite"></div>
+  <div class="auth-grid">
+    <section class="card" aria-labelledby="studentAuthTitle">
+      <h2 id="studentAuthTitle">Student Access</h2>
+      <div class="tabs-mini" role="tablist" aria-label="Student login or sign up">
+        <button id="tabLoginBtn" class="active" role="tab" aria-selected="true" aria-controls="loginForm" onclick="switchAuthTab('login')">Login</button>
+        <button id="tabRegisterBtn" role="tab" aria-selected="false" aria-controls="registerForm" onclick="switchAuthTab('register')">Sign Up</button>
+      </div>
+      <form id="loginForm" autocomplete="off" onsubmit="return handleLogin(event)">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" autocomplete="off" required>
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" autocomplete="off" required>
+        <button class="btn" style="width:100%">Student Login</button>
+      </form>
+
+      <form id="registerForm" style="display:none" onsubmit="return handleRegister(event)">
+        <label for="regName">Full Name</label>
+        <input type="text" id="regName" autocomplete="name" required>
+        <label for="regUsername">Username</label>
+        <input type="text" id="regUsername" autocomplete="username" required>
+        <label for="regPassword">Password</label>
+        <input type="password" id="regPassword" autocomplete="new-password" required minlength="4">
+        <button class="btn" style="width:100%">Create Student Account</button>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="adminAuthTitle">
+      <h2 id="adminAuthTitle">Admin Access</h2>
+      <form id="adminLoginForm" autocomplete="off" onsubmit="return handleAdminLogin(event)">
+        <label for="adminUsername">Admin Username</label>
+        <input type="text" id="adminUsername" autocomplete="off" required>
+        <label for="adminPassword">Admin Password</label>
+        <input type="password" id="adminPassword" autocomplete="off" required>
+        <button class="btn" style="width:100%">Admin Login</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div id="appScreen" style="display:none">
+  <header>
+    <h1>🎓 School Document Request & Queue System</h1>
+    <div class="user-info">
+      <span id="currentUserLabel"></span>
+      <button onclick="logout()" aria-label="Log out of your account">Logout</button>
+    </div>
+  </header>
+
+  <nav id="navBar" aria-label="Main navigation" role="tablist"></nav>
+
+  <main id="mainContent">
+    <!-- CUSTOMER: BOOK -->
+    <div class="view" id="view-book">
+      <div class="card">
+        <h2>Request a Document / Appointment</h2>
+        <div id="bookMsg" role="alert" aria-live="polite"></div>
+        <form onsubmit="return handleBook(event)">
+          <div class="grid">
+            <div>
+              <label for="bookService">Services</label>
+              <select id="bookService" required></select>
+            </div>
+            <div>
+              <label for="bookStudentId">Student ID Number</label>
+              <input type="text" id="bookStudentId" placeholder="e.g. 2023-00123" maxlength="30" required>
+            </div>
+            <div>
+              <label for="bookProgram">Program &amp; Year Level</label>
+              <input type="text" id="bookProgram" placeholder="e.g. BSIT - 3rd Year" maxlength="60">
+            </div>
+          </div>
+          <div class="grid">
+            <div>
+              <label for="bookDate">Preferred Date</label>
+              <input type="date" id="bookDate" required>
+            </div>
+            <div>
+              <label for="bookTime">Preferred Time</label>
+              <input type="time" id="bookTime" required>
+            </div>
+            <div>
+              <label for="bookCopies">Number of Copies</label>
+              <input type="number" id="bookCopies" min="1" max="50" inputmode="numeric" value="1" required>
+            </div>
+          </div>
+          <label for="bookPurpose">Purpose of Request</label>
+          <select id="bookPurpose" onchange="toggleOtherPurpose()" required>
+            <option value="">Select a purpose...</option>
+            <option value="Scholarship application">Scholarship application</option>
+            <option value="Transfer to another school">Transfer to another school</option>
+            <option value="Employment requirement">Employment requirement</option>
+            <option value="College/University admission">College/University admission</option>
+            <option value="Board exam / licensure requirement">Board exam / licensure requirement</option>
+            <option value="Loan or financial assistance application">Loan or financial assistance application</option>
+            <option value="Visa / travel requirement">Visa / travel requirement</option>
+            <option value="Personal file copy">Personal file copy</option>
+            <option value="Other">Other (please specify)</option>
+          </select>
+          <input type="text" id="bookPurposeOther" placeholder="Please specify your purpose..." maxlength="200" style="display:none">
+          <label for="bookNotes">Additional Notes (optional)</label>
+          <textarea id="bookNotes" rows="2" placeholder="Any other details the school office should know..."></textarea>
+          <button class="btn">Submit Request</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- CUSTOMER: MY APPOINTMENTS -->
+    <div class="view" id="view-myAppointments">
+      <div class="card">
+        <h2>My Requests</h2>
+        <div id="myAppointmentsTable"></div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER: MY QUEUE -->
+    <div class="view" id="view-myQueue">
+      <div class="card">
+        <h2>My Queue Status</h2>
+        <p style="color:var(--muted);font-size:13px;margin-top:-8px">Your position in line to claim or process your requested document.</p>
+        <div id="myQueueBox"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN: DASHBOARD -->
+    <div class="view" id="view-dashboard">
+      <div class="stats" id="dashboardStats"></div>
+      <div class="card" style="margin-top:18px">
+        <h2>Today's Queue Overview</h2>
+        <div id="dashboardQueueTable"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN: APPROVALS -->
+    <div class="view" id="view-approvals">
+      <div class="card">
+        <h2>Pending Approvals</h2>
+        <p style="color:var(--muted);font-size:13px;margin-top:-8px">Review new document/appointment requests and approve or reject them. Approved requests are assigned a queue number.</p>
+        <p class="scroll-hint">↔️ Scroll horizontally to see all columns</p>
+        <div id="approvalsTable"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN: APPOINTMENTS -->
+    <div class="view" id="view-appointments">
+      <div class="card">
+        <div class="flex-between">
+          <h2 style="margin:0">All Requests</h2>
+          <div>
+            <label for="apptFilter" class="sr-only">Filter appointments by status</label>
+            <select id="apptFilter" onchange="renderAppointmentsAdmin()" style="max-width:180px;margin:0">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+        </div>
+        <p class="scroll-hint" style="margin-top:12px">↔️ Scroll horizontally to see all columns</p>
+        <div id="adminAppointmentsTable"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN: QUEUE MANAGEMENT -->
+    <div class="view" id="view-queue">
+      <div class="card flex-between">
+        <div>
+          <h2 style="margin:0">Now Serving</h2>
+          <div class="queue-number" id="nowServingNum" aria-live="polite">--</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn success" onclick="callNextQueue()">Call Next</button>
+          <button class="btn warning" onclick="completeCurrentQueue()">Mark Done</button>
+          <button class="btn secondary" onclick="skipCurrentQueue()">Skip</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Waiting Queue</h2>
+        <div id="queueWaitingTable"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN: SERVICES -->
+    <div class="view" id="view-services">
+      <div class="card">
+        <h2>Manage Student Needs</h2>
+        <div id="serviceMsg" role="alert" aria-live="polite"></div>
+        <form onsubmit="return handleAddService(event)" class="grid" style="align-items:end">
+          <div>
+            <label for="svcName">Student Need Name</label>
+            <input type="text" id="svcName" placeholder="e.g. Certificate of Enrollment" required>
+          </div>
+          <div>
+            <button class="btn" style="width:100%">Add Student Need</button>
+          </div>
+        </form>
+        <div id="servicesTable"></div>
+      </div>
+    </div>
+  </main>
+  <footer>School Document Request &amp; Appointment System — data stored locally in your browser</footer>
+</div>
+
+<script>
+/* ---------------- DATA LAYER (localStorage) ---------------- */
+const DB_KEY = 'oaqms_data_v1';
+
+function loadDB(){
+  let db = JSON.parse(localStorage.getItem(DB_KEY) || 'null');
+  if(!db){
+    db = {
+      users: [
+        {id:'u_admin', name:'System Admin', username:'admin', password:'admin123', role:'admin'}
+      ],
+      services: DEFAULT_SERVICES.slice(),
+      appointments: [],
+      queue: [],
+      queueCounter: 0
+    };
+    saveDB(db);
+  }
+  migrateLegacyUsers(db);
+  removeLegacyClinicServices(db);
+  restoreDefaultServicesIfEmpty(db);
+  return db;
+}
+
+const DEFAULT_SERVICES = [
+  {id:'s1', name:'School Prospectus'},
+  {id:'s2', name:'Certificate of Enrollment'},
+  {id:'s3', name:'Transcript of Records (TOR)'},
+  {id:'s4', name:'Good Moral Certificate'},
+  {id:'s5', name:'Diploma (2nd Copy / Authentication)'},
+  {id:'s6', name:'Form 137 (Permanent Record)'},
+  {id:'s7', name:'Form 138 (Report Card)'},
+  {id:'s8', name:'Honorable Dismissal / Transfer Credentials'},
+  {id:'s9', name:'School ID Replacement'},
+  {id:'s10', name:'Certification, Authentication & Verification (CAV)'},
+  {id:'s11', name:'Certificate of Grades'},
+  {id:'s12', name:'Certificate of Graduation'},
+  {id:'s13', name:'Library Clearance'},
+  {id:'s14', name:'Registrar Clearance'},
+  {id:'s15', name:'Other Request (Specify in Notes)'}
+];
+
+// Older versions stored accounts with an "email" field instead of "username";
+// backfill so existing browsers with saved data can still log in.
+function migrateLegacyUsers(db){
+  let changed = false;
+  db.users.forEach(u=>{
+    if(!u.username){
+      u.username = u.role==='admin' ? 'admin' : (u.email ? u.email.split('@')[0] : u.name.toLowerCase().replace(/\s+/g,'')) ;
+      changed = true;
+    }
+  });
+  if(changed) saveDB(db);
+}
+
+// Earlier versions seeded clinic-style entries (e.g. "General Consultation"); strip
+// them out of existing browser data now that this app is school-document focused.
+const LEGACY_CLINIC_SERVICE_NAMES = ['general consultation','dental checkup','vaccination'];
+function removeLegacyClinicServices(db){
+  const before = db.services.length;
+  db.services = db.services.filter(s=>!LEGACY_CLINIC_SERVICE_NAMES.includes(s.name.trim().toLowerCase()));
+  if(db.services.length !== before) saveDB(db);
+}
+
+// If every service got removed (e.g. admin deleted them all, or the legacy cleanup above
+// stripped a browser's only entries), restore the defaults so the request form isn't empty.
+function restoreDefaultServicesIfEmpty(db){
+  if(db.services.length === 0){
+    db.services = DEFAULT_SERVICES.slice();
+    saveDB(db);
+  }
+}
+function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+
+let DB = loadDB();
+let currentUser = JSON.parse(sessionStorage.getItem('oaqms_current_user') || 'null');
+
+/* ---------------- RENDER HELPERS ---------------- */
+const HTML_ESCAPE_MAP = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, ch => HTML_ESCAPE_MAP[ch]);
+}
+
+// Builds a table (or an empty-state message) from a row-rendering callback so each
+// admin/customer list view doesn't repeat its own markup + empty-check logic.
+function renderTable(container, headers, items, emptyMessage, rowFn, emptyIcon){
+  const box = typeof container === 'string' ? document.getElementById(container) : container;
+  if(!items.length){
+    box.innerHTML = `<div class="empty"><div class="empty-icon" aria-hidden="true">${emptyIcon || '🗂️'}</div>${escapeHtml(emptyMessage)}</div>`;
+    return;
+  }
+  box.innerHTML = `<div class="table-scroll"><table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>` +
+    `<tbody>${items.map(rowFn).join('')}</tbody></table></div>`;
+}
+
+function setFieldInvalid(id, invalid){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.toggle('invalid', invalid);
+  if(invalid) el.setAttribute('aria-invalid','true'); else el.removeAttribute('aria-invalid');
+}
+
+function clearFieldInvalid(...ids){
+  ids.forEach(id=>setFieldInvalid(id, false));
+}
+
+function setMsg(elementId, text, type){
+  document.getElementById(elementId).innerHTML = `<div class="msg ${type}">${escapeHtml(text)}</div>`;
+}
+
+function clearMsg(elementId){
+  document.getElementById(elementId).innerHTML = '';
+}
+
+function todayISODate(){ return new Date().toISOString().split('T')[0]; }
+
+/* ---------------- AUTH ---------------- */
+function switchAuthTab(tab){
+  const isLogin = tab==='login';
+  document.getElementById('tabLoginBtn').classList.toggle('active', isLogin);
+  document.getElementById('tabLoginBtn').setAttribute('aria-selected', String(isLogin));
+  document.getElementById('tabRegisterBtn').classList.toggle('active', !isLogin);
+  document.getElementById('tabRegisterBtn').setAttribute('aria-selected', String(!isLogin));
+  document.getElementById('loginForm').style.display = isLogin ? 'block':'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none':'block';
+  clearMsg('authMsg');
+}
+
+function handleRegister(e){
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const username = document.getElementById('regUsername').value.trim().toLowerCase();
+  const password = document.getElementById('regPassword').value;
+
+  if(!name || !username || !password){
+    showAuthMsg('Please fill in all fields.','error');
+    return false;
+  }
+  if(DB.users.some(u=>u.username===username)){
+    showAuthMsg('An account with this username already exists.','error');
+    return false;
+  }
+  const user = {id:uid('u'), name, username, password, role:'customer'};
+  DB.users.push(user);
+  saveDB(DB);
+  showAuthMsg('Account created! You can now log in.','ok');
+  switchAuthTab('login');
+  document.getElementById('registerForm').reset();
+  return false;
+}
+
+function handleLogin(e){
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+
+  const user = DB.users.find(u=>u.role==='customer' && u.username===username && u.password===password);
+  if(!user){
+    showAuthMsg('Invalid username or password.','error');
+    return false;
+  }
+  currentUser = user;
+  sessionStorage.setItem('oaqms_current_user', JSON.stringify(user));
+  enterApp();
+  return false;
+}
+
+function handleAdminLogin(e){
+  e.preventDefault();
+  const username = document.getElementById('adminUsername').value.trim().toLowerCase();
+  const password = document.getElementById('adminPassword').value;
+
+  const user = DB.users.find(u=>u.role==='admin' && u.username===username && u.password===password);
+  if(!user){
+    showAuthMsg('Invalid admin username or password.','error');
+    return false;
+  }
+  currentUser = user;
+  sessionStorage.setItem('oaqms_current_user', JSON.stringify(user));
+  enterApp();
+  return false;
+}
+
+function showAuthMsg(text, type){
+  setMsg('authMsg', text, type);
+}
+
+function logout(){
+  currentUser = null;
+  sessionStorage.removeItem('oaqms_current_user');
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('authScreen').style.display='block';
+  document.getElementById('loginForm').reset();
+  document.getElementById('registerForm').reset();
+  document.getElementById('adminLoginForm').reset();
+  switchAuthTab('login');
+}
+
+/* ---------------- APP SHELL ---------------- */
+const CUSTOMER_TABS = [
+  {id:'book', label:'Request Document'},
+  {id:'myAppointments', label:'My Requests'},
+  {id:'myQueue', label:'My Queue'}
+];
+const ADMIN_TABS = [
+  {id:'dashboard', label:'Dashboard'},
+  {id:'approvals', label:'Approvals'},
+  {id:'appointments', label:'All Requests'},
+  {id:'queue', label:'Queue Management'},
+  {id:'services', label:'Student Needs'}
+];
+
+function enterApp(){
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  document.getElementById('currentUserLabel').textContent = `${currentUser.name} (${currentUser.role})`;
+
+  const tabs = currentUser.role==='admin' ? ADMIN_TABS : CUSTOMER_TABS;
+  const nav = document.getElementById('navBar');
+  nav.innerHTML = tabs.map((t,i)=>`<button data-view="${t.id}" class="${i===0?'active':''}" role="tab" aria-selected="${i===0}" onclick="showView('${t.id}')">${escapeHtml(t.label)}</button>`).join('');
+
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  showView(tabs[0].id);
+}
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('#navBar button').forEach(b=>{
+    const isActive = b.dataset.view===id;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-selected', String(isActive));
+  });
+
+  if(id==='book') renderBookForm();
+  if(id==='myAppointments') renderMyAppointments();
+  if(id==='myQueue') renderMyQueue();
+  if(id==='dashboard') renderDashboard();
+  if(id==='approvals') renderApprovalsAdmin();
+  if(id==='appointments') renderAppointmentsAdmin();
+  if(id==='queue') renderQueueAdmin();
+  if(id==='services') renderServices();
+}
+
+/* ---------------- CUSTOMER: BOOKING ---------------- */
+function renderBookForm(){
+  const sel = document.getElementById('bookService');
+  sel.innerHTML = DB.services.length
+    ? DB.services.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')
+    : '<option value="">No student needs available</option>';
+  const dateInput = document.getElementById('bookDate');
+  dateInput.min = todayISODate();
+}
+
+function toggleOtherPurpose(){
+  const purposeSelect = document.getElementById('bookPurpose');
+  const otherInput = document.getElementById('bookPurposeOther');
+  const isOther = purposeSelect.value === 'Other';
+  otherInput.style.display = isOther ? 'block' : 'none';
+  otherInput.required = isOther;
+  if(!isOther) otherInput.value = '';
+}
+
+function handleBook(e){
+  e.preventDefault();
+  const serviceId = document.getElementById('bookService').value;
+  const studentIdInput = document.getElementById('bookStudentId');
+  const copiesInput = document.getElementById('bookCopies');
+  const purposeInput = document.getElementById('bookPurpose');
+  const studentId = studentIdInput.value.trim();
+  const program = document.getElementById('bookProgram').value.trim();
+  const date = document.getElementById('bookDate').value;
+  const time = document.getElementById('bookTime').value;
+  const copies = parseInt(copiesInput.value, 10);
+  const purposeChoice = purposeInput.value.trim();
+  const purposeOther = document.getElementById('bookPurposeOther').value.trim();
+  const purpose = purposeChoice === 'Other' ? purposeOther : purposeChoice;
+  const notes = document.getElementById('bookNotes').value.trim();
+  const service = DB.services.find(s=>s.id===serviceId);
+
+  clearFieldInvalid('bookStudentId','bookCopies','bookPurpose');
+
+  if(!service){
+    setMsg('bookMsg', 'Please choose a valid student need.', 'error');
+    return false;
+  }
+  if(!studentId || studentId.length > 30){
+    setFieldInvalid('bookStudentId', true);
+    setMsg('bookMsg', studentId ? 'Student ID number is too long (max 30 characters).' : 'Please enter your student ID number.', 'error');
+    studentIdInput.focus();
+    return false;
+  }
+  if(!purpose){
+    setFieldInvalid('bookPurpose', true);
+    setMsg('bookMsg', purposeChoice === 'Other' ? 'Please specify your purpose.' : 'Please select the purpose of your request.', 'error');
+    (purposeChoice === 'Other' ? document.getElementById('bookPurposeOther') : purposeInput).focus();
+    return false;
+  }
+  if(!Number.isInteger(copies) || copies < 1 || copies > 50){
+    setFieldInvalid('bookCopies', true);
+    setMsg('bookMsg', 'Please enter a valid number of copies (1-50).', 'error');
+    copiesInput.focus();
+    return false;
+  }
+  const now = new Date();
+  const chosen = new Date(`${date}T${time || '00:00'}`);
+  if(!date || !time || isNaN(chosen.getTime()) || chosen < now){
+    setMsg('bookMsg', 'Please choose a valid date and time in the future.', 'error');
+    return false;
+  }
+
+  const appt = {
+    id: uid('a'),
+    userId: currentUser.id,
+    userName: currentUser.name,
+    serviceId, serviceName: service.name,
+    studentId, program, copies, purpose,
+    date, time, notes,
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  };
+  DB.appointments.push(appt);
+  saveDB(DB);
+  setMsg('bookMsg', `Request submitted for ${date} at ${time}. Await confirmation from the school office.`, 'ok');
+  e.target.reset();
+  toggleOtherPurpose();
+  renderBookForm();
+  return false;
+}
+
+function renderMyAppointments(){
+  const list = DB.appointments.filter(a=>a.userId===currentUser.id)
+    .sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+  renderTable('myAppointmentsTable',
+    ['Student Need','Purpose','Copies','Date','Time','Status','Action'],
+    list,
+    'No requests yet.',
+    a=>`<tr>
+      <td>${escapeHtml(a.serviceName)}</td><td>${escapeHtml(a.purpose) || '-'}</td><td>${a.copies || 1}</td><td>${escapeHtml(a.date)}</td><td>${escapeHtml(a.time)}</td>
+      <td><span class="badge ${a.status}">${escapeHtml(a.status)}</span></td>
+      <td>${a.status==='pending'||a.status==='confirmed' ? `<button class="btn danger sm" onclick="cancelMyAppointment('${a.id}')">Cancel</button>`:'-'}</td>
+    </tr>`,
+    '📄'
+  );
+}
+
+function cancelMyAppointment(id){
+  const appt = DB.appointments.find(a=>a.id===id);
+  if(!appt || (appt.status !== 'pending' && appt.status !== 'confirmed')) return;
+  appt.status='cancelled';
+  saveDB(DB);
+  renderMyAppointments();
+}
+
+function renderMyQueue(){
+  const entry = DB.queue.find(q=>q.userId===currentUser.id && (q.status==='waiting'||q.status==='serving'));
+  const box = document.getElementById('myQueueBox');
+  if(!entry){
+    box.innerHTML = '<div class="empty"><div class="empty-icon" aria-hidden="true">🎫</div>You are not currently in the queue. Once the school office confirms your request, you will be added to the queue automatically.</div>';
+    return;
+  }
+  const waitingBefore = DB.queue.filter(q=>q.status==='waiting' && q.number < entry.number).length;
+  box.innerHTML = `
+    <div class="queue-number">#${entry.number}</div>
+    <p style="text-align:center"><span class="badge ${entry.status}">${escapeHtml(entry.status)}</span></p>
+    <p style="text-align:center;color:var(--muted)">${entry.status==='waiting' ? `${waitingBefore} people ahead of you` : 'You are being served now'}</p>
+  `;
+}
+
+/* ---------------- ADMIN: DASHBOARD ---------------- */
+function renderDashboard(){
+  const today = todayISODate();
+  const todaysAppts = DB.appointments.filter(a=>a.date===today);
+  const stats = document.getElementById('dashboardStats');
+  stats.innerHTML = `
+    <div class="stat"><div class="num">${DB.appointments.length}</div><div class="lbl">Total Requests</div></div>
+    <div class="stat"><div class="num">${todaysAppts.length}</div><div class="lbl">Today's Requests</div></div>
+    <div class="stat"><div class="num">${DB.appointments.filter(a=>a.status==='pending').length}</div><div class="lbl">Pending Approval</div></div>
+    <div class="stat"><div class="num">${DB.queue.filter(q=>q.status==='waiting').length}</div><div class="lbl">In Queue Now</div></div>
+  `;
+  const active = DB.queue.filter(q=>q.status==='waiting'||q.status==='serving').sort((a,b)=>a.number-b.number);
+  renderTable('dashboardQueueTable',
+    ['#','Name','Student Need','Status'],
+    active,
+    'Queue is empty.',
+    q=>`<tr><td>${q.number}</td><td>${escapeHtml(q.userName)}</td><td>${escapeHtml(q.serviceName)}</td><td><span class="badge ${q.status}">${escapeHtml(q.status)}</span></td></tr>`,
+    '🎟️'
+  );
+}
+
+/* ---------------- ADMIN: APPOINTMENTS ---------------- */
+function renderAppointmentsAdmin(){
+  const filter = document.getElementById('apptFilter').value;
+  let list = [...DB.appointments].sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+  if(filter!=='all') list = list.filter(a=>a.status===filter);
+  renderTable('adminAppointmentsTable',
+    ['Requester','Student ID','Student Need','Purpose','Date','Time','Status','Actions'],
+    list,
+    'No requests found.',
+    a=>`<tr>
+      <td>${escapeHtml(a.userName)}</td><td>${escapeHtml(a.studentId) || '-'}</td><td>${escapeHtml(a.serviceName)}</td><td>${escapeHtml(a.purpose) || '-'}</td><td>${escapeHtml(a.date)}</td><td>${escapeHtml(a.time)}</td>
+      <td><span class="badge ${a.status}">${escapeHtml(a.status)}</span></td>
+      <td class="actions-cell">
+        ${a.status==='pending' ? `<button class="btn success" onclick="confirmAppointment('${a.id}')">Confirm</button>` : ''}
+        ${a.status==='pending'||a.status==='confirmed' ? `<button class="btn danger" onclick="cancelAppointmentAdmin('${a.id}')">Cancel</button>` : ''}
+        ${a.status==='confirmed' ? `<button class="btn secondary" onclick="markDone('${a.id}')">Mark Done</button>` : ''}
+      </td>
+    </tr>`,
+    '📄'
+  );
+}
+
+/* ---------------- ADMIN: APPROVALS ---------------- */
+function renderApprovalsAdmin(){
+  const pending = DB.appointments.filter(a=>a.status==='pending')
+    .sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  renderTable('approvalsTable',
+    ['Requester','Student ID','Program/Year','Student Need','Copies','Purpose','Date','Time','Actions'],
+    pending,
+    'No pending requests.',
+    a=>`<tr>
+      <td>${escapeHtml(a.userName)}</td><td>${escapeHtml(a.studentId) || '-'}</td><td>${escapeHtml(a.program) || '-'}</td><td>${escapeHtml(a.serviceName)}</td><td>${a.copies || 1}</td><td>${escapeHtml(a.purpose) || '-'}</td><td>${escapeHtml(a.date)}</td><td>${escapeHtml(a.time)}</td>
+      <td class="actions-cell">
+        <button class="btn success sm" onclick="confirmAppointment('${a.id}')">Approve</button>
+        <button class="btn danger sm" onclick="cancelAppointmentAdmin('${a.id}')">Reject</button>
+      </td>
+    </tr>`,
+    '✅'
+  );
+}
+
+function confirmAppointment(id){
+  const appt = DB.appointments.find(a=>a.id===id);
+  if(!appt || appt.status !== 'pending') return;
+  appt.status='confirmed';
+  DB.queueCounter += 1;
+  DB.queue.push({
+    id: uid('q'),
+    number: DB.queueCounter,
+    userId: appt.userId,
+    userName: appt.userName,
+    serviceName: appt.serviceName,
+    appointmentId: appt.id,
+    status: 'waiting',
+    createdAt: new Date().toISOString()
+  });
+  saveDB(DB);
+  renderApprovalsAdmin();
+  renderAppointmentsAdmin();
+}
+
+function cancelAppointmentAdmin(id){
+  const appt = DB.appointments.find(a=>a.id===id);
+  if(!appt || appt.status==='cancelled' || appt.status==='done') return;
+  appt.status='cancelled';
+  const q = DB.queue.find(q=>q.appointmentId===id && (q.status==='waiting'||q.status==='serving'));
+  if(q) q.status='cancelled';
+  saveDB(DB);
+  renderApprovalsAdmin();
+  renderAppointmentsAdmin();
+}
+
+function markDone(id){
+  const appt = DB.appointments.find(a=>a.id===id);
+  if(!appt || appt.status !== 'confirmed') return;
+  appt.status='done';
+  const q = DB.queue.find(q=>q.appointmentId===id);
+  if(q) q.status='done';
+  saveDB(DB);
+  renderAppointmentsAdmin();
+}
+
+/* ---------------- ADMIN: QUEUE MANAGEMENT ---------------- */
+function renderQueueAdmin(){
+  const serving = DB.queue.find(q=>q.status==='serving');
+  document.getElementById('nowServingNum').textContent = serving ? `#${serving.number} - ${serving.userName}` : '--';
+
+  const waiting = DB.queue.filter(q=>q.status==='waiting').sort((a,b)=>a.number-b.number);
+  renderTable('queueWaitingTable',
+    ['#','Name','Student Need','Action'],
+    waiting,
+    'No one waiting.',
+    q=>`<tr><td>${q.number}</td><td>${escapeHtml(q.userName)}</td><td>${escapeHtml(q.serviceName)}</td>
+      <td><button class="btn danger sm" onclick="removeFromQueue('${q.id}')">Remove</button></td></tr>`,
+    '🎟️'
+  );
+}
+
+function callNextQueue(){
+  const current = DB.queue.find(q=>q.status==='serving');
+  if(current){ alert('Please mark the current customer as done or skip before calling next.'); return; }
+  const next = DB.queue.filter(q=>q.status==='waiting').sort((a,b)=>a.number-b.number)[0];
+  if(!next){ alert('No one is waiting in the queue.'); return; }
+  next.status='serving';
+  saveDB(DB);
+  renderQueueAdmin();
+}
+
+function completeCurrentQueue(){
+  const current = DB.queue.find(q=>q.status==='serving');
+  if(!current){ alert('No one is currently being served.'); return; }
+  current.status='done';
+  const appt = DB.appointments.find(a=>a.id===current.appointmentId);
+  if(appt) appt.status='done';
+  saveDB(DB);
+  renderQueueAdmin();
+}
+
+function skipCurrentQueue(){
+  const current = DB.queue.find(q=>q.status==='serving');
+  if(!current){ alert('No one is currently being served.'); return; }
+  current.status='waiting';
+  saveDB(DB);
+  renderQueueAdmin();
+}
+
+function removeFromQueue(id){
+  const q = DB.queue.find(q=>q.id===id);
+  if(!q || q.status !== 'waiting') return;
+  q.status='cancelled';
+  saveDB(DB);
+  renderQueueAdmin();
+}
+
+/* ---------------- ADMIN: SERVICES ---------------- */
+function renderServices(){
+  renderTable('servicesTable',
+    ['Student Need','Action'],
+    DB.services,
+    'No student needs yet. Add one above.',
+    s=>`<tr><td>${escapeHtml(s.name)}</td>
+      <td><button class="btn danger sm" onclick="deleteService('${s.id}')">Delete</button></td></tr>`,
+    '🧾'
+  );
+}
+
+function handleAddService(e){
+  e.preventDefault();
+  const name = document.getElementById('svcName').value.trim();
+
+  if(!name){
+    setMsg('serviceMsg', 'Please enter a student need name.', 'error');
+    return false;
+  }
+  if(DB.services.some(s=>s.name.toLowerCase()===name.toLowerCase())){
+    setMsg('serviceMsg', 'A student need with this name already exists.', 'error');
+    return false;
+  }
+
+  DB.services.push({id:uid('s'), name});
+  saveDB(DB);
+  clearMsg('serviceMsg');
+  e.target.reset();
+  renderServices();
+  return false;
+}
+
+function deleteService(id){
+  DB.services = DB.services.filter(s=>s.id!==id);
+  saveDB(DB);
+  renderServices();
+}
+
+/* ---------------- INIT ---------------- */
+if(currentUser){
+  const fresh = DB.users.find(u=>u.id===currentUser.id);
+  if(fresh){ currentUser = fresh; enterApp(); }
+}
+</script>
+</body>
+</html>
